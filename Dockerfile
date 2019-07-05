@@ -5,7 +5,7 @@ FROM centos/s2i-base-centos7
 
 MAINTAINER Ben Parees <bparees@redhat.com>
 
-EXPOSE 8080
+EXPOSE 8080 9990
 
 ENV WILDFLY_VERSION=12.0.0.Final \
     MAVEN_VERSION=3.5.4
