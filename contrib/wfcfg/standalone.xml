@@ -31,6 +31,12 @@
         <extension module="org.wildfly.extension.security.manager"/>
         <extension module="org.wildfly.extension.undertow"/>
     </extensions>
+    <system-properties>
+        <property name="ee8.preview.mode" value="true"/>
+        <property name="eclipselink.target-server" value="JBoss"/>
+        <property name="eclipselink.archive.factory" value="org.jipijapa.eclipselink.JBossArchiveFactoryImpl"/>
+        <property name="eclipselink.logging.logger" value="org.jipijapa.eclipselink.JBossLogger"/>
+    </system-properties>
     <management>
         <security-realms>
             <security-realm name="ManagementRealm">
@@ -44,12 +50,12 @@
             </security-realm>
             <security-realm name="ApplicationRealm">
                 <server-identities>
-                    <ssl>
-                        <keystore path="application.keystore" relative-to="jboss.server.config.dir" keystore-password="password" alias="server" key-password="password" generate-self-signed-certificate-host="localhost"/>
-                    </ssl>
+                    <ssl >
+                       <keystore path="application.keystore" relative-to="jboss.server.config.dir" keystore-password="password" alias="server" key-password="password" generate-self-signed-certificate-host="localhost"/>
+                     </ssl>
                 </server-identities>
                 <authentication>
-                    <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
+                     <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
                     <properties path="application-users.properties" relative-to="jboss.server.config.dir"/>
                 </authentication>
                 <authorization>
@@ -140,66 +146,60 @@
         <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
         <subsystem xmlns="urn:jboss:domain:datasources:5.0">
             <datasources>
-                <datasource jndi-name="java:jboss/datasources/${env.OPENSHIFT_EXAMPLE_DATASOURCE}" pool-name="${env.OPENSHIFT_EXAMPLE_DATASOURCE}" enabled="true" use-java-context="true">
-                    <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
-                    <driver>h2</driver>
-                    <security>
-                        <user-name>sa</user-name>
-                        <password>sa</password>
-                    </security>
-                </datasource>
-                <datasource jndi-name="java:jboss/datasources/${env.OPENSHIFT_MYSQL_DATASOURCE}" enabled="${mysql.enabled}" use-java-context="true" pool-name="${env.OPENSHIFT_MYSQL_DATASOURCE}" use-ccm="true">
+               <datasource jta="true" jndi-name="java:/jdbc/fitness" pool-name="fitness" enabled="true" use-ccm="false">
                     <connection-url>jdbc:mysql://${env.OPENSHIFT_MYSQL_DB_HOST}:${env.OPENSHIFT_MYSQL_DB_PORT}/${env.OPENSHIFT_MYSQL_DB_NAME}</connection-url>
-                    <driver>mysql</driver>
+                    <driver-class>com.mysql.jdbc.Driver</driver-class>
+                    <driver>mysql-connector-java-5.1.45.jar_com.mysql.jdbc.Driver_5_1</driver>
                     <security>
-                      <user-name>${env.OPENSHIFT_MYSQL_DB_USERNAME}</user-name>
-                      <password>${env.OPENSHIFT_MYSQL_DB_PASSWORD}</password>
+                        <user-name>${env.OPENSHIFT_MYSQL_DB_USERNAME}</user-name>
+                        <password>${env.OPENSHIFT_MYSQL_DB_PASSWORD}</password>
                     </security>
                     <validation>
-                        <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
+                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
                         <background-validation>true</background-validation>
-                        <background-validation-millis>60000</background-validation-millis>
-                        <!--<validate-on-match>true</validate-on-match>-->
+                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
                     </validation>
-                    <pool>
-                        <flush-strategy>IdleConnections</flush-strategy>
-                    </pool>
                 </datasource>
-                <datasource jndi-name="java:jboss/datasources/${env.OPENSHIFT_POSTGRESQL_DATASOURCE}" enabled="${postgresql.enabled}" use-java-context="true" pool-name="${env.OPENSHIFT_POSTGRESQL_DATASOURCE}" use-ccm="true">
-                    <connection-url>jdbc:postgresql://${env.OPENSHIFT_POSTGRESQL_DB_HOST}:${env.OPENSHIFT_POSTGRESQL_DB_PORT}/${env.OPENSHIFT_POSTGRESQL_DB_NAME}</connection-url>
-                    <driver>postgresql</driver>
+                <datasource jta="true" jndi-name="java:/jdbc/fitness2" pool-name="fitness2" enabled="true" use-ccm="true">
+                    <connection-url>jdbc:mysql://${env.OPENSHIFT_MYSQL_DB_HOST}:${env.OPENSHIFT_MYSQL_DB_PORT}/${env.OPENSHIFT_MYSQL_DB_NAME}</connection-url>
+                    <driver-class>com.mysql.jdbc.Driver</driver-class>
+                    <driver>mysql-connector-java-5.1.45.jar_com.mysql.jdbc.Driver_5_1</driver>
                     <security>
-                      <user-name>${env.OPENSHIFT_POSTGRESQL_DB_USERNAME}</user-name>
-                      <password>${env.OPENSHIFT_POSTGRESQL_DB_PASSWORD}</password>
+                        <user-name>${env.OPENSHIFT_MYSQL_DB_USERNAME}</user-name>
+                        <password>${env.OPENSHIFT_MYSQL_DB_PASSWORD}</password>
                     </security>
                     <validation>
-                        <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
+                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
                         <background-validation>true</background-validation>
-                        <background-validation-millis>60000</background-validation-millis>
-                        <!--<validate-on-match>true</validate-on-match>-->
+                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
                     </validation>
-                    <pool>
-                        <flush-strategy>IdleConnections</flush-strategy>
-                    </pool>
+                </datasource>
+                <datasource jta="true" jndi-name="java:/jdbc/quartz" pool-name="quartz" enabled="true" use-ccm="true">
+                    <connection-url>jdbc:mysql://${env.OPENSHIFT_MYSQL_DB_HOST}:${env.OPENSHIFT_MYSQL_DB_PORT}/${env.OPENSHIFT_MYSQL_DB_NAME}</connection-url>
+                    <driver-class>com.mysql.jdbc.Driver</driver-class>
+                    <driver>mysql-connector-java-5.1.45.jar_com.mysql.jdbc.Driver_5_1</driver>
+                    <security>
+                        <user-name>${env.OPENSHIFT_MYSQL_DB_USERNAME}</user-name>
+                        <password>${env.OPENSHIFT_MYSQL_DB_PASSWORD}</password>
+                    </security>
+                    <validation>
+                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
+                        <background-validation>true</background-validation>
+                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
+                    </validation>
                 </datasource>
                 <drivers>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
                     </driver>
-                    <driver name="mysql" module="com.mysql.jdbc">
-                        <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
-                    </driver>
-                    <driver name="postgresql" module="org.postgresql.jdbc">
-                        <xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
-                    </driver>
                 </drivers>
             </datasources>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:deployment-scanner:2.0">
-            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" runtime-failure-causes-rollback="${jboss.deployment.scanner.rollback.on.failure:false}" auto-deploy-exploded="${env.OPENSHIFT_AUTO_DEPLOY_EXPLODED}"/>
+            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" runtime-failure-causes-rollback="${jboss.deployment.scanner.rollback.on.failure:false}"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ee:4.0">
-            <spec-descriptor-property-replacement>true</spec-descriptor-property-replacement>
+            <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
             <concurrent>
                 <context-services>
                     <context-service name="default" jndi-name="java:jboss/ee/concurrency/context/default" use-transaction-setup-provider="true"/>
@@ -214,7 +214,7 @@
                     <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-threshold="60000" keepalive-time="3000"/>
                 </managed-scheduled-executor-services>
             </concurrent>
-            <default-bindings context-service="java:jboss/ee/concurrency/context/default" datasource="java:jboss/datasources/${env.OPENSHIFT_DEFAULT_DATASOURCE}" managed-executor-service="java:jboss/ee/concurrency/executor/default" managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default" managed-thread-factory="java:jboss/ee/concurrency/factory/default"/>
+            <default-bindings context-service="java:jboss/ee/concurrency/context/default" datasource="java:jboss/datasources/ExampleDS" managed-executor-service="java:jboss/ee/concurrency/executor/default" managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default" managed-thread-factory="java:jboss/ee/concurrency/factory/default"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ejb3:5.0">
             <session-bean>
@@ -262,8 +262,8 @@
         <subsystem xmlns="urn:wildfly:elytron:2.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
             <providers>
                 <aggregate-providers name="combined-providers">
-                    <providers name="elytron"/>
                     <providers name="openssl"/>
+                    <providers name="elytron"/>
                 </aggregate-providers>
                 <provider-loader name="elytron" module="org.wildfly.security.elytron"/>
                 <provider-loader name="openssl" module="org.wildfly.openssl"/>
@@ -314,14 +314,14 @@
                 </constant-role-mapper>
             </mappers>
             <http>
-                <http-authentication-factory name="management-http-authentication" http-server-mechanism-factory="global" security-domain="ManagementDomain">
+                <http-authentication-factory name="management-http-authentication" security-domain="ManagementDomain" http-server-mechanism-factory="global">
                     <mechanism-configuration>
                         <mechanism mechanism-name="DIGEST">
                             <mechanism-realm realm-name="ManagementRealm"/>
                         </mechanism>
                     </mechanism-configuration>
                 </http-authentication-factory>
-                <http-authentication-factory name="application-http-authentication" http-server-mechanism-factory="global" security-domain="ApplicationDomain">
+                <http-authentication-factory name="application-http-authentication" security-domain="ApplicationDomain" http-server-mechanism-factory="global">
                     <mechanism-configuration>
                         <mechanism mechanism-name="BASIC">
                             <mechanism-realm realm-name="Application Realm"/>
@@ -360,6 +360,7 @@
                 </mechanism-provider-filtering-sasl-server-factory>
                 <provider-sasl-server-factory name="global"/>
             </sasl>
+            
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:io:2.0">
             <worker name="default"/>
@@ -373,26 +374,16 @@
             </cache-container>
             <cache-container name="web" default-cache="passivation" module="org.wildfly.clustering.web.infinispan">
                 <local-cache name="passivation">
-                    <locking isolation="REPEATABLE_READ"/>
+                    <locking acquire-timeout="60000" isolation="REPEATABLE_READ" striping="false"/>
                     <transaction mode="BATCH"/>
                     <file-store passivation="true" purge="false"/>
-                </local-cache>
-                <local-cache name="persistent">
-                    <locking isolation="REPEATABLE_READ"/>
-                    <transaction mode="BATCH"/>
-                    <file-store passivation="false" purge="false"/>
                 </local-cache>
             </cache-container>
             <cache-container name="ejb" aliases="sfsb" default-cache="passivation" module="org.wildfly.clustering.ejb.infinispan">
                 <local-cache name="passivation">
-                    <locking isolation="REPEATABLE_READ"/>
+                    <locking acquire-timeout="60000" isolation="REPEATABLE_READ" striping="false"/>
                     <transaction mode="BATCH"/>
                     <file-store passivation="true" purge="false"/>
-                </local-cache>
-                <local-cache name="persistent">
-                    <locking isolation="REPEATABLE_READ"/>
-                    <transaction mode="BATCH"/>
-                    <file-store passivation="false" purge="false"/>
                 </local-cache>
             </cache-container>
             <cache-container name="hibernate" module="org.infinispan.hibernate-cache">
@@ -462,6 +453,17 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:security:2.0">
             <security-domains>
+                <security-domain name="secureDomain" cache-type="default">
+                    <authentication>
+                        <login-module code="Database" flag="required">
+                            <module-option name="dsJndiName" value="java:/jdbc/fitness"/>
+                            <module-option name="principalsQuery" value="select password from customers where username=?"/>
+                            <module-option name="rolesQuery" value="select groupname,'Roles' from groups where username=?"/>
+                            <module-option name="hashAlgorithm" value="SHA-256"/>
+                            <module-option name="hashEncoding" value="base64"/>
+                        </login-module>
+                    </authentication>
+                </security-domain>
                 <security-domain name="other" cache-type="default">
                     <authentication>
                         <login-module code="Remoting" flag="optional">
@@ -505,7 +507,7 @@
             <buffer-cache name="default"/>
             <server name="default-server">
                 <http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true"/>
-                <https-listener name="https" socket-binding="https" security-realm="ApplicationRealm" enable-http2="true"/>
+                <https-listener name="https" socket-binding="https" security-realm="ApplicationRealm" enable-http2="true" http2-enable-push="false"/>
                 <host name="default-host" alias="localhost">
                     <location name="/" handler="welcome-content"/>
                     <filter-ref name="server-header"/>
@@ -542,7 +544,7 @@
             <inet-address value="${jboss.bind.address.management:127.0.0.1}"/>
         </interface>
         <interface name="public">
-            <inet-address value="${jboss.bind.address:127.0.0.1}"/>
+            <inet-address value="${jboss.bind.address:0.0.0.0}"/>
         </interface>
     </interfaces>
     <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
@@ -550,7 +552,7 @@
         <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9993}"/>
         <socket-binding name="ajp" port="${jboss.ajp.port:8009}"/>
         <socket-binding name="http" port="${jboss.http.port:8080}"/>
-        <socket-binding name="https" port="${jboss.https.port:8443}"/>
+        <socket-binding name="https" port="${jboss.https.port:8081}"/>
         <socket-binding name="txn-recovery-environment" port="4712"/>
         <socket-binding name="txn-status-manager" port="4713"/>
         <outbound-socket-binding name="mail-smtp">
