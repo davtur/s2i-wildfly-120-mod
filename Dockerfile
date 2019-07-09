@@ -22,9 +22,9 @@ LABEL io.k8s.description="Platform for building and running JEE applications on 
 # Install Maven, Wildfly
 RUN INSTALL_PKGS="(curl -v https://www.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | \
     tar -zx -C /usr/local) && \
-    ln -sf /usr/local/apache-maven-$MAVEN_VERSION/bin/mvn /usr/local/bin/mvn && \
-    mkdir -p $HOME/.m2 && \
-    mkdir -p /opt/s2i/destination"
+    ln -sf /usr/local/apache-maven-$MAVEN_VERSION/bin/mvn /usr/local/bin/mvn"
+    
+RUN  mkdir -p $HOME/.m2 &&  mkdir -p /opt/s2i/destination
 
 # Add s2i wildfly customizations
 ADD ./contrib/wfmodules/ /opt/jboss/wildfly/modules/
