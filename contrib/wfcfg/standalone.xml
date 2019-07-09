@@ -33,9 +33,7 @@
     </extensions>
     <system-properties>
         <property name="ee8.preview.mode" value="true"/>
-        <property name="eclipselink.target-server" value="JBoss"/>
         <property name="eclipselink.archive.factory" value="org.jipijapa.eclipselink.JBossArchiveFactoryImpl"/>
-        <property name="eclipselink.logging.logger" value="org.jipijapa.eclipselink.JBossLogger"/>
     </system-properties>
     <management>
         <security-realms>
@@ -50,12 +48,13 @@
             </security-realm>
             <security-realm name="ApplicationRealm">
                 <server-identities>
-                    <ssl >
-                       <keystore path="application.keystore" relative-to="jboss.server.config.dir" keystore-password="password" alias="server" key-password="password" generate-self-signed-certificate-host="localhost"/>
-                     </ssl>
+                    <ssl protocol="openssl.TLSv1.2">
+                        <keystore path="home-manlyit.p12" relative-to="jboss.server.config.dir" keystore-password="Surf2day" alias="homemanlyit" key-password="Surf2day"/>
+                    </ssl>
                 </server-identities>
                 <authentication>
-                     <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
+                    <truststore path="home-manlyit.p12" relative-to="jboss.server.config.dir" keystore-password="Surf2day"/>
+                    <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
                     <properties path="application-users.properties" relative-to="jboss.server.config.dir"/>
                 </authentication>
                 <authorization>
@@ -146,6 +145,14 @@
         <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
         <subsystem xmlns="urn:jboss:domain:datasources:5.0">
             <datasources>
+                <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
+                    <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+                    <driver>h2</driver>
+                    <security>
+                        <user-name>sa</user-name>
+                        <password>sa</password>
+                    </security>
+                </datasource>
                <datasource jta="true" jndi-name="java:/jdbc/fitness" pool-name="fitness" enabled="true" use-ccm="false">
                     <connection-url>jdbc:mysql://${env.OPENSHIFT_MYSQL_DB_HOST}:${env.OPENSHIFT_MYSQL_DB_PORT}/${env.OPENSHIFT_MYSQL_DB_NAME}</connection-url>
                     <driver-class>com.mysql.jdbc.Driver</driver-class>
@@ -360,7 +367,23 @@
                 </mechanism-provider-filtering-sasl-server-factory>
                 <provider-sasl-server-factory name="global"/>
             </sasl>
-            
+            <tls>
+                <key-stores>
+                    <key-store name="server">
+                        <credential-reference clear-text="Surf2day"/>
+                        <implementation type="jks"/>
+                        <file path="home-manlyit.p12" relative-to="jboss.server.config.dir"/>
+                    </key-store>
+                </key-stores>
+                <key-managers>
+                    <key-manager name="server" key-store="server">
+                        <credential-reference clear-text="Surf2day"/>
+                    </key-manager>
+                </key-managers>
+                <server-ssl-contexts>
+                    <server-ssl-context name="server" protocols="TLSv1.2" key-manager="server"/>
+                </server-ssl-contexts>
+            </tls>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:io:2.0">
             <worker name="default"/>
@@ -559,4 +582,7 @@
             <remote-destination host="${env.OPENSHIFT_SMTP_HOST}" port="25"/>
         </outbound-socket-binding>
     </socket-binding-group>
+    <deployments>
+        
+    </deployments>
 </server>
