@@ -34,11 +34,10 @@ ADD ./contrib/settings.xml $HOME/.m2/
 
 # Copy the S2I scripts from the specific language image to $STI_SCRIPTS_PATH
 COPY ./s2i/bin/ $STI_SCRIPTS_PATH
-
-RUN chown -R 1001:0 /opt/jboss/wildfly && chown -R 1001:0 $HOME && \
-    chmod -R ug+rwX /opt/jboss/wildfly && \
+RUN /opt/jboss/wildfly/bin/add-user.sh admin Admin#70365 --silent
+RUN chown -R 1000:0 $HOME && \
     chmod -R g+rw /opt/s2i/destination
 
-USER 1001
+USER 1000
 
 CMD $STI_SCRIPTS_PATH/usage
