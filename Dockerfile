@@ -1,11 +1,11 @@
 # This image provides a base for building and running WildFly applications.
 # It builds using maven and runs the resulting artifacts on WildFly 12.0.0 Final
 
-FROM centos/s2i-base-centos7
+FROM jboss/wildfly:12.0.0.Final
 
 MAINTAINER Ben Parees <bparees@redhat.com>
 
-EXPOSE 8080 9990
+EXPOSE 8080 9990 8081 9993
 
 ENV WILDFLY_VERSION=12.0.0.Final \
     MAVEN_VERSION=3.5.4
@@ -14,7 +14,7 @@ LABEL io.k8s.description="Platform for building and running JEE applications on 
       io.k8s.display-name="WildFly 12.0.0.Final" \
       io.openshift.expose-services="8080:http" \
       io.openshift.tags="builder,wildfly,wildfly12" \
-      io.openshift.s2i.assemble-input-files="/wildfly/standalone/deployments;/wildfly/standalone/configuration;/wildfly/provided_modules" \
+      io.openshift.s2i.assemble-input-files="/opt/jboss/wildfly/standalone/deployments;/opt/jboss/wildfly/standalone/configuration;/opt/jboss/wildfly/provided_modules" \
       io.openshift.s2i.destination="/opt/s2i/destination" \
       com.redhat.deployments-dir="/wildfly/standalone/deployments" \
       maintainer="Ben Parees <bparees@redhat.com>"
