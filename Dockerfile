@@ -13,7 +13,6 @@ ENV WILDFLY_VERSION=12.0.0.Final \
 LABEL io.k8s.description="Platform for building and running JEE applications on WildFly 12.0.0.Final" \
       io.k8s.display-name="WildFly 12.0.0.Final" \
       io.openshift.expose-services="8080:http"  \
-      io.openshift.s2i.scripts-url="image://opt/s2i/destination/scripts" \
       io.openshift.tags="builder,wildfly,wildfly12" \
       io.openshift.s2i.assemble-input-files="/opt/jboss/wildfly/standalone/deployments;/opt/jboss/wildfly/standalone/configuration;/opt/jboss/wildfly/provided_modules" \
       io.openshift.s2i.destination="/opt/s2i/destination" \
@@ -23,11 +22,15 @@ LABEL io.k8s.description="Platform for building and running JEE applications on 
 USER root
 
 # Install Maven, Wildfly
-RUN INSTALL_PKGS="(curl -v https://www.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | \
+RUN INSTALL_PKGS="tar unzip bc which lsof java-1.8.0-openjdk java-1.8.0-openjdk-devel" && \
+    yum install -y --enablerepo=centosplus $INSTALL_PKGS && \
+    rpm -V $INSTALL_PKGS && \
+    yum clean all -y && \
+    (curl -v https://www.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | \
     tar -zx -C /usr/local) && \
-    ln -sf /usr/local/apache-maven-$MAVEN_VERSION/bin/mvn /usr/local/bin/mvn"
-    
-RUN  mkdir -p $HOME/.m2 &&  mkdir -p /opt/s2i/destination
+    ln -sf /usr/local/apache-maven-$MAVEN_VERSION/bin/mvn /usr/local/bin/mvn && \
+    mkdir -p $HOME/.m2 && \
+    mkdir -p /opt/s2i/destination
 
 # Add s2i wildfly customizations
 ADD ./contrib/wfmodules/ /opt/jboss/wildfly/modules/
