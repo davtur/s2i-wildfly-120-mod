@@ -1,9 +1,9 @@
 #!/bin/bash
 
 echo "Asssembling runtime environment..."
-DEPLOY_DIR=/wildfly/standalone/deployments
-CONFIG_DIR=/wildfly/standalone/configuration
-MODULES_DIR=/wildfly/modules
+DEPLOY_DIR=/opt/jboss/wildfly/standalone/deployments
+CONFIG_DIR=/opt/jboss/wildfly/standalone/configuration
+MODULES_DIR=/opt/jboss/wildfly/modules
 
 echo "Creating deployment directories..."
 mkdir -p $DEPLOY_DIR

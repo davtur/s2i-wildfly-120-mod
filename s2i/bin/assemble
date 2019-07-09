@@ -18,7 +18,7 @@ function restore_saved_artifacts() {
 function getscanconfig() {
   count=0
   while [ ${count} -lt 10 ]; do
-    scanconfig=`/wildfly/bin/jboss-cli.sh -u=$ADMIN -p=$PASSWORD -c "/subsystem=deployment-scanner/:read-resource(recursive=true)" 2>&1 || :`
+    scanconfig=`/opt/jboss/wildfly/bin/jboss-cli.sh -u=$ADMIN -p=$PASSWORD -c "/subsystem=deployment-scanner/:read-resource(recursive=true)" 2>&1 || :`
     if [[ $scanconfig =~ '"outcome" => "success"' ]] ; then
       SCANCONFIG=$scanconfig
       return
@@ -49,7 +49,7 @@ function waitondeployments() {
     if [ "$SCANCONFIG" == "" ]; then
       echo "Could not connect to JBoss management interface, skipping deployment verification"
     elif [[ $SCANCONFIG =~ '"scan-enabled" => true' ]]; then
-      DEPLOYMENTS_DIR=/wildfly/standalone/deployments
+      DEPLOYMENTS_DIR=/opt/jboss/wildfly/standalone/deployments
       pushd $DEPLOYMENTS_DIR
 
       artifacts=()
@@ -219,8 +219,8 @@ mkdir -p $LOCAL_SOURCE_DIR
 # artifacts (*.war, *.jar)
 ARTIFACT_DIR=${ARTIFACT_DIR:-target}
 
-# Resulting WAR files will be deployed to /wildfly/standalone/deployments
-DEPLOY_DIR=/wildfly/standalone/deployments
+# Resulting WAR files will be deployed to /opt/jboss/wildfly/standalone/deployments
+DEPLOY_DIR=/opt/jboss/wildfly/standalone/deployments
 mkdir -p $DEPLOY_DIR
 
 # Copy the source for compilation
@@ -236,7 +236,7 @@ if [ -d $LOCAL_SOURCE_DIR/configuration ]; then
     mv $LOCAL_SOURCE_DIR/configuration/settings.xml $HOME/.m2
   fi
 
-  cp -v $LOCAL_SOURCE_DIR/configuration/* /wildfly/standalone/configuration/ 2> /dev/null
+  cp -v $LOCAL_SOURCE_DIR/configuration/* /opt/jboss/wildfly/standalone/configuration/ 2> /dev/null
 fi
 
 configure_proxy
@@ -332,19 +332,19 @@ fi
 
 if [ -d $LOCAL_SOURCE_DIR/cfg ]; then
   echo "Copying config files from project..."
-  cp cfg/* /wildfly/standalone/configuration
-  chgrp -R 0 /wildfly/standalone/configuration
-  chmod -R g+rw /wildfly/standalone/configuration
+  cp cfg/* /opt/jboss/wildfly/standalone/configuration
+  chgrp -R 0 /opt/jboss/wildfly/standalone/configuration
+  chmod -R g+rw /opt/jboss/wildfly/standalone/configuration
 fi
 
 # this dir needs to always exist because the extended build
 # flow expects to copy from it (even if it's empty)
-mkdir /wildfly/provided_modules
+mkdir /opt/jboss/wildfly/provided_modules
 if [ -d $LOCAL_SOURCE_DIR/modules ]; then
   echo "Copying modules from project..."
-  cp -r modules/* /wildfly/modules
-  chgrp -R 0 /wildfly/modules
-  chmod -R g+rw /wildfly/modules
+  cp -r modules/* /opt/jboss/wildfly/modules
+  chgrp -R 0 /opt/jboss/wildfly/modules
+  chmod -R g+rw /opt/jboss/wildfly/modules
 fi
 echo "...done"
 
@@ -354,10 +354,10 @@ echo "...done"
 # at build time, so don't do this for now.
 
 # add admin user
-#/wildfly/bin/add-user.sh $ADMIN $PASSWORD --silent
+#/opt/jboss/wildfly/bin/add-user.sh $ADMIN $PASSWORD --silent
 
 #echo "Starting wildfly for deployment"
-#/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 &
+#/opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 &
 #echo $! > ${PID_FILE}
 
 #rc=0
@@ -372,10 +372,10 @@ echo "...done"
 
 #waitondeployments
 #rc=$?
-#/wildfly/bin/jboss-cli.sh -u=$ADMIN -p=$PASSWORD -c ":shutdown"
+#/opt/jboss/wildfly/bin/jboss-cli.sh -u=$ADMIN -p=$PASSWORD -c ":shutdown"
 #rm /tmp/wildfly.pid
 
 # remove admin user
-#sed -i '/^#/! s/^/#/' /wildfly/{standalone,domain}/configuration/mgmt-{groups,users}.properties
+#sed -i '/^#/! s/^/#/' /opt/jboss/wildfly/{standalone,domain}/configuration/mgmt-{groups,users}.properties
 
 exit $rc
