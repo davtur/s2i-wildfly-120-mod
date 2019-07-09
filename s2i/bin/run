@@ -1,2 +1,2 @@
 #!/bin/bash
-exec /wildfly/bin/standalone.sh -Dee8.preview.mode=true -b 0.0.0.0 -bmanagement 0.0.0.0
+exec /wildfly/bin/standalone.sh -c standalone-custom.xml -b 0.0.0.0 -bmanagement 0.0.0.0
