@@ -19,6 +19,8 @@ LABEL io.k8s.description="Platform for building and running JEE applications on 
       com.redhat.deployments-dir="/opt/jboss/wildfly/standalone/deployments" \
       maintainer="Dodgy Dave <david@manlyit.com.au"
 
+USER root
+
 # Install Maven, Wildfly
 RUN INSTALL_PKGS="(curl -v https://www.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | \
     tar -zx -C /usr/local) && \
