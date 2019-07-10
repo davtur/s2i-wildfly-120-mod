@@ -16,7 +16,6 @@ LABEL io.k8s.description="Platform for building and running JEE applications on 
       io.openshift.tags="builder,wildfly,wildfly12" \
       io.openshift.s2i.assemble-input-files="/opt/jboss/wildfly/standalone/deployments;/opt/jboss/wildfly/standalone/configuration;/opt/jboss/wildfly/provided_modules" \
       io.openshift.s2i.destination="/opt/s2i/destination" \
-      io.openshift.s2i.scripts-url="image:/$STI_SCRIPTS_PATH" \
       com.redhat.deployments-dir="/opt/jboss/wildfly/standalone/deployments" \
       maintainer="Dodgy Dave <david@manlyit.com.au"
 
